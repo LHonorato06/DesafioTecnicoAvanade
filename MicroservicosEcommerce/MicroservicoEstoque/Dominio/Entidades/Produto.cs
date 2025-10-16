@@ -1,12 +1,27 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace MicroservicoEstoque.Dominio.Entidades
 {
    public class Produto
 {
-    public int Id { get; set; }
-    public string Nome { get; set; } = default!;
-    public string Descricao { get; set; } = default!;
-    public decimal Preco { get; set; }
-    public int Quantidade { get; set; }
+   [Key]
+        public int Id { get; set; }
+
+       [Required]
+[Column(TypeName = "varchar(255)")]
+public string Nome { get; set; } = string.Empty;
+
+[Required]
+[Column(TypeName = "longtext")]
+public string Descricao { get; set; } = string.Empty;
+
+        [Required]
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Preco { get; set; }
+
+        [Required]
+        public int Quantidade { get; set; }
 }
 
 }

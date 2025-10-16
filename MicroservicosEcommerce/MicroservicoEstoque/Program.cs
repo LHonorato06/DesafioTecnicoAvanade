@@ -1,41 +1,76 @@
+using Microsoft.EntityFrameworkCore;
+using MicroservicoEstoque.Infraestrutura.Db;
+using MicroservicoEstoque.Dominio.Entidades;
+using MicroservicoEstoque.Infraestrutura;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// 🗃️ Configuração do banco
+builder.Services.AddDbContext<EstoqueContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Criar banco e seed inicial
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<EstoqueContext>();
+    db.Database.EnsureCreated();
+    DbInitializer.Seed(db);
+}
+
+// Swagger
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+// 📦 Rotas Minimal API
+app.MapGet("/produtos", async (EstoqueContext db) =>
+    await db.Produtos.ToListAsync());
 
-app.MapGet("/weatherforecast", () =>
+app.MapGet("/produtos/{id:int}", async (int id, EstoqueContext db) =>
+    await db.Produtos.FindAsync(id) is Produto p ? Results.Ok(p) : Results.NotFound());
+
+app.MapPost("/api/produtos", async (Produto produto, EstoqueContext db) =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    db.Produtos.Add(produto);
+    await db.SaveChangesAsync();
+    return Results.Created($"/api/produtos/{produto.Id}", produto);
+});
+
+app.MapPut("/produtos/{id:int}", async (int id, Produto input, EstoqueContext db) =>
+{
+    var produto = await db.Produtos.FindAsync(id);
+    if (produto is null) return Results.NotFound();
+
+    produto.Nome = input.Nome;
+    produto.Descricao = input.Descricao;
+    produto.Preco = input.Preco;
+    produto.Quantidade = input.Quantidade;
+
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+app.MapDelete("/produtos/{id}", async (int id, EstoqueContext db) =>
+{
+    var produto = await db.Produtos.FindAsync(id);
+    if (produto is null) return Results.NotFound();
+
+    db.Produtos.Remove(produto);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

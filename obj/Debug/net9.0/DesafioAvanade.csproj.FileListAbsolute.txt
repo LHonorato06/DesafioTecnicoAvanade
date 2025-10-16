@@ -1,0 +1,9 @@
+C:\Users\honor\IdeaProjects\DesafioAvanade\obj\Debug\net9.0\DesafioAvanade.csproj.AssemblyReference.cache
+C:\Users\honor\IdeaProjects\DesafioAvanade\obj\Debug\net9.0\rpswa.dswa.cache.json
+C:\Users\honor\IdeaProjects\DesafioAvanade\obj\Debug\net9.0\DesafioAvanade.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\honor\IdeaProjects\DesafioAvanade\obj\Debug\net9.0\DesafioAvanade.AssemblyInfoInputs.cache
+C:\Users\honor\IdeaProjects\DesafioAvanade\obj\Debug\net9.0\DesafioAvanade.AssemblyInfo.cs
+C:\Users\honor\IdeaProjects\DesafioAvanade\obj\Debug\net9.0\DesafioAvanade.csproj.CoreCompileInputs.cache
+C:\Users\honor\IdeaProjects\DesafioAvanade\obj\Debug\net9.0\DesafioAvanade.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\honor\IdeaProjects\DesafioAvanade\obj\Debug\net9.0\DesafioAvanade.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\honor\IdeaProjects\DesafioAvanade\obj\Debug\net9.0\DesafioAvanade.sourcelink.json

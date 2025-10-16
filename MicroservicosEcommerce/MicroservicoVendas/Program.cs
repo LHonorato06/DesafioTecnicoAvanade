@@ -1,41 +1,53 @@
+using Microsoft.EntityFrameworkCore;
+using MicroservicoVendas.Infraestrutura.Db;
+using MicroservicoVendas.Dominio.Entidades;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// 🗃️ Configuração do banco
+builder.Services.AddDbContext<VendasContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Criar banco se não existir
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<VendasContext>();
+    db.Database.EnsureCreated();
+}
+
+// Swagger
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+// 💳 Rotas Minimal API
+app.MapGet("/pedidos", async (VendasContext db) =>
+    await db.Pedidos.Include(p => p.Itens).ToListAsync());
 
-app.MapGet("/weatherforecast", () =>
+app.MapGet("/pedidos/{id:int}", async (int id, VendasContext db) =>
+    await db.Pedidos.Include(p => p.Itens)
+        .FirstOrDefaultAsync(p => p.Id == id) is Pedido pedido
+        ? Results.Ok(pedido)
+        : Results.NotFound());
+
+app.MapPost("/pedidos", async (Pedido pedido, VendasContext db) =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    db.Pedidos.Add(pedido);
+    await db.SaveChangesAsync();
+    // 🔜 futuramente enviar mensagem via RabbitMQ
+    return Results.Created($"/api/pedidos/{pedido.Id}", pedido);
+});
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
