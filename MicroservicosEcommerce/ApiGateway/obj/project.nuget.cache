@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "lg6LoEG4IFw=",
+  "dgSpecHash": "6tfq0oqJ74k=",
   "success": true,
-  "projectFilePath": "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicoEstoque\\MicroservicoEstoque.csproj",
+  "projectFilePath": "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicosEcommerce\\ApiGateway\\ApiGateway.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\honor\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.8\\microsoft.aspnetcore.openapi.9.0.8.nupkg.sha512",
     "C:\\Users\\honor\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"

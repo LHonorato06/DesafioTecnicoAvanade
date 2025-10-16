@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicoEstoque\\MicroservicoEstoque.csproj": {}
+    "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicosEcommerce\\MicroservicoEstoque\\MicroservicoEstoque.csproj": {}
   },
   "projects": {
-    "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicoEstoque\\MicroservicoEstoque.csproj": {
+    "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicosEcommerce\\MicroservicoEstoque\\MicroservicoEstoque.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicoEstoque\\MicroservicoEstoque.csproj",
+        "projectUniqueName": "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicosEcommerce\\MicroservicoEstoque\\MicroservicoEstoque.csproj",
         "projectName": "MicroservicoEstoque",
-        "projectPath": "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicoEstoque\\MicroservicoEstoque.csproj",
+        "projectPath": "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicosEcommerce\\MicroservicoEstoque\\MicroservicoEstoque.csproj",
         "packagesPath": "C:\\Users\\honor\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicoEstoque\\obj\\",
+        "outputPath": "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicosEcommerce\\MicroservicoEstoque\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\honor\\AppData\\Roaming\\NuGet\\NuGet.Config"

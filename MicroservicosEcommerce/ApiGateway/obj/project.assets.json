@@ -80,11 +80,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicoEstoque\\MicroservicoEstoque.csproj",
-      "projectName": "MicroservicoEstoque",
-      "projectPath": "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicoEstoque\\MicroservicoEstoque.csproj",
+      "projectUniqueName": "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicosEcommerce\\ApiGateway\\ApiGateway.csproj",
+      "projectName": "ApiGateway",
+      "projectPath": "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicosEcommerce\\ApiGateway\\ApiGateway.csproj",
       "packagesPath": "C:\\Users\\honor\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicoEstoque\\obj\\",
+      "outputPath": "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicosEcommerce\\ApiGateway\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\honor\\AppData\\Roaming\\NuGet\\NuGet.Config"
