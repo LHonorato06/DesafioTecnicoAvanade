@@ -1,11 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "9rbfmPEkY6o=",
+  "dgSpecHash": "AbfG/G+jBc8=",
   "success": true,
   "projectFilePath": "C:\\Users\\honor\\IdeaProjects\\DesafioAvanade\\MicroservicosEcommerce\\MicroservicoVendas\\MicroservicoVendas.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\honor\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.8\\microsoft.aspnetcore.openapi.9.0.8.nupkg.sha512",
-    "C:\\Users\\honor\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+    "C:\\Users\\honor\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512",
+    "C:\\Users\\honor\\.nuget\\packages\\rabbitmq.client\\6.8.1\\rabbitmq.client.6.8.1.nupkg.sha512",
+    "C:\\Users\\honor\\.nuget\\packages\\system.memory\\4.5.5\\system.memory.4.5.5.nupkg.sha512",
+    "C:\\Users\\honor\\.nuget\\packages\\system.threading.channels\\7.0.0\\system.threading.channels.7.0.0.nupkg.sha512"
   ],
   "logs": []
 }

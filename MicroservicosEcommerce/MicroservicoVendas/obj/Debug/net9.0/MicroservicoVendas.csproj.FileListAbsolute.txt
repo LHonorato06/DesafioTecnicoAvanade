@@ -1,0 +1,9 @@
+C:\Users\honor\IdeaProjects\DesafioAvanade\MicroservicosEcommerce\MicroservicoVendas\obj\Debug\net9.0\MicroservicoVendas.csproj.AssemblyReference.cache
+C:\Users\honor\IdeaProjects\DesafioAvanade\MicroservicosEcommerce\MicroservicoVendas\obj\Debug\net9.0\rpswa.dswa.cache.json
+C:\Users\honor\IdeaProjects\DesafioAvanade\MicroservicosEcommerce\MicroservicoVendas\obj\Debug\net9.0\MicroservicoVendas.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\honor\IdeaProjects\DesafioAvanade\MicroservicosEcommerce\MicroservicoVendas\obj\Debug\net9.0\MicroservicoVendas.AssemblyInfoInputs.cache
+C:\Users\honor\IdeaProjects\DesafioAvanade\MicroservicosEcommerce\MicroservicoVendas\obj\Debug\net9.0\MicroservicoVendas.AssemblyInfo.cs
+C:\Users\honor\IdeaProjects\DesafioAvanade\MicroservicosEcommerce\MicroservicoVendas\obj\Debug\net9.0\MicroservicoVendas.csproj.CoreCompileInputs.cache
+C:\Users\honor\IdeaProjects\DesafioAvanade\MicroservicosEcommerce\MicroservicoVendas\obj\Debug\net9.0\MicroservicoVendas.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\honor\IdeaProjects\DesafioAvanade\MicroservicosEcommerce\MicroservicoVendas\obj\Debug\net9.0\MicroservicoVendas.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\honor\IdeaProjects\DesafioAvanade\MicroservicosEcommerce\MicroservicoVendas\obj\Debug\net9.0\MicroservicoVendas.sourcelink.json
