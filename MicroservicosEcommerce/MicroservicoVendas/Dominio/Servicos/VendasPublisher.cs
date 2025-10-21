@@ -29,6 +29,6 @@ public class VendasPublisher
             body: body
         );
 
-        Console.WriteLine($"[x] Mensagem enviada: {mensagem}");
+        Console.WriteLine($" Mensagem enviada: {mensagem}");
     }
 }

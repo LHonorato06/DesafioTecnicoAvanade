@@ -3,10 +3,7 @@ using MicroservicoVendas.Infraestrutura.Db;
 using MicroservicoVendas.Dominio.Entidades;
 using MicroservicoVendas.Dominio.Servicos;
 using MicroservicoVendas.Dominio.DTOs;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.OpenApi.Models;
+
 
 #region Builder
 var builder = WebApplication.CreateBuilder(args);
@@ -31,58 +28,6 @@ builder.Services.AddHttpClient("estoque", c =>
     c.BaseAddress = new Uri("http://localhost:5001");
 }).AddHttpMessageHandler<JwtDelegatingHandler>();
 
-
-#region Configurar validação JWT
-var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.RequireHttpsMetadata = false; // em dev; true em prod
-    options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidateAudience = true,
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        ValidateLifetime = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuerSigningKey = true,
-        ClockSkew = TimeSpan.FromSeconds(30)
-    };
-});
-
-// ADICIONE ISSO
-builder.Services.AddAuthorization();
-#endregion
-
-
-#region Configurar Swagger para testar tokens
-builder.Services.AddSwaggerGen(c =>
-{
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = "Use: Bearer {token}",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT"
-    });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement{
-        {
-            new OpenApiSecurityScheme{ Reference = new OpenApiReference{ Type = ReferenceType.SecurityScheme, Id = "Bearer" } },
-            new string[]{}
-        }
-    });
-});
-#endregion
 var app = builder.Build();
 #endregion
 
@@ -112,7 +57,6 @@ app.MapGet("/", () => Results.Redirect("/swagger"))
 #endregion
 
 
-// 💳 Rotas Minimal API
 #region Pedidos 
 
 app.MapGet("/pedidos", async (VendasContext db) =>

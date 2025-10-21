@@ -1,13 +1,22 @@
-using ApiGateway.Models;
+using ApiGateway.Data;
+using ApiGateway.Dominio.DTOs;
+using ApiGateway.Dominio.Models;
+using ApiGateway.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 
 #region builder
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        new MySqlServerVersion(new Version(8, 0, 0))
+    )
+);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -36,7 +45,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 #endregion
 
-#region  HttpClients (deve ser antes do app.Build)
+#region  HttpClients
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<JwtDelegatingHandler>();
@@ -88,41 +97,34 @@ app.UseSwaggerUI();
 app.UseAuthentication();
 app.UseAuthorization();
 
-#region  Endpoint de login - gera o JWT
-app.MapPost("/login", (LoginRequest req, IConfiguration cfg) =>
+#region Endpoint de login - gera o JWT
+app.MapPost("/login", async (LoginRequest request, AppDbContext db) =>
 {
-    if (req.Username != "admin" || req.Password != "admin123")
+    var usuario = await db.Usuarios.FirstOrDefaultAsync(u => u.Email == request.Email);
+    if (usuario == null)
         return Results.Unauthorized();
 
-    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(cfg["Jwt:Key"]));
-    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-    var expires = DateTime.UtcNow.AddMinutes(double.Parse(cfg["Jwt:ExpiryMinutes"] ?? "60"));
+    // Verifica senha com BCrypt
+    if (!BCrypt.Net.BCrypt.Verify(request.Senha, usuario.SenhaHash))
+        return Results.Unauthorized();
 
-    var claims = new[]
-    {
-        new Claim(JwtRegisteredClaimNames.Sub, req.Username),
-        new Claim(ClaimTypes.Role, "Admin"),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-    };
-
-    var token = new JwtSecurityToken(
-        issuer: cfg["Jwt:Issuer"],
-        audience: cfg["Jwt:Audience"],
-        claims: claims,
-        expires: expires,
-        signingCredentials: creds
-    );
-
-    var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-    return Results.Ok(new LoginResponse(jwt, expires));
+    // Gera o token JWT
+var token = JwtTokenService.GenerateToken(usuario, builder.Configuration);
+    return Results.Ok(new { token });
 })
 .AllowAnonymous()
-.WithTags("Auth");
+.WithTags("Auth")
+.WithName("Login")
+.WithOpenApi(op =>
+{
+    op.Summary = "Realizar login";
+    op.Description = "Autentica o usuário e retorna um JWT válido para acessar os endpoints protegidos.";
+    return op;
+});
 #endregion
 
 
-#region Vendas (via Gateway)
-
+#region Rotas - Gateway Vendas
 app.MapGet("/gateway/vendas/pedidos", async (IHttpClientFactory factory, HttpContext ctx) =>
 {
     var client = factory.CreateClient("vendas");
@@ -136,7 +138,14 @@ app.MapGet("/gateway/vendas/pedidos", async (IHttpClientFactory factory, HttpCon
     return Results.Content(content, "application/json");
 })
 .RequireAuthorization()
-.WithTags("Gateway - Vendas");
+.WithTags("Gateway - Vendas")
+.WithName("ListarPedidos")
+.WithOpenApi(op =>
+{
+    op.Summary = "Listar todos os pedidos";
+    op.Description = "Retorna a lista de todos os pedidos registrados no sistema de vendas.";
+    return op;
+});
 
 
 app.MapGet("/gateway/vendas/pedidos/{id:int}", async (int id, IHttpClientFactory factory, HttpContext ctx) =>
@@ -152,7 +161,14 @@ app.MapGet("/gateway/vendas/pedidos/{id:int}", async (int id, IHttpClientFactory
     return Results.Content(content, "application/json");
 })
 .RequireAuthorization()
-.WithTags("Gateway - Vendas");
+.WithTags("Gateway - Vendas")
+.WithName("BuscarPedidoPorId")
+.WithOpenApi(op =>
+{
+    op.Summary = "Buscar pedido por ID";
+    op.Description = "Recupera os detalhes de um pedido específico com base no ID fornecido.";
+    return op;
+});
 
 
 app.MapPost("/gateway/vendas/pedidos", async (PedidoDTO pedido, IHttpClientFactory httpClientFactory) =>
@@ -161,14 +177,19 @@ app.MapPost("/gateway/vendas/pedidos", async (PedidoDTO pedido, IHttpClientFacto
     var response = await httpClient.PostAsJsonAsync("/pedidos", pedido);
 
     return Results.StatusCode((int)response.StatusCode);
-}).RequireAuthorization()
-.WithTags("Gateway - Vendas");
-
+})
+.RequireAuthorization()
+.WithTags("Gateway - Vendas")
+.WithName("CriarPedido")
+.WithOpenApi(op =>
+{
+    op.Summary = "Fazer um novo pedido";
+    op.Description = "Cria um novo pedido no sistema de vendas com os dados fornecidos.";
+    return op;
+});
 #endregion
 
 #region Rotas - Gateway Estoque
-
-// ✅ Listar todos os produtos
 app.MapGet("/gateway/estoque/produtos", async (IHttpClientFactory factory, HttpContext ctx) =>
 {
     var client = factory.CreateClient("estoque");
@@ -183,9 +204,16 @@ app.MapGet("/gateway/estoque/produtos", async (IHttpClientFactory factory, HttpC
     return Results.Content(content, "application/json");
 })
 .RequireAuthorization()
-.WithTags("Gateway - Estoque");
+.WithTags("Gateway - Estoque")
+.WithName("ListarProdutos")
+.WithOpenApi(op =>
+{
+    op.Summary = "Listar todos os produtos";
+    op.Description = "Retorna a lista completa de produtos disponíveis no estoque.";
+    return op;
+});
 
-// ✅ Buscar produto por ID
+
 app.MapGet("/gateway/estoque/produtos/{id:int}", async (int id, IHttpClientFactory factory, HttpContext ctx) =>
 {
     var client = factory.CreateClient("estoque");
@@ -200,52 +228,73 @@ app.MapGet("/gateway/estoque/produtos/{id:int}", async (int id, IHttpClientFacto
     return Results.Content(content, "application/json");
 })
 .RequireAuthorization()
-.WithTags("Gateway - Estoque");
+.WithTags("Gateway - Estoque")
+.WithName("BuscarProdutoPorId")
+.WithOpenApi(op =>
+{
+    op.Summary = "Buscar produto por ID";
+    op.Description = "Recupera os dados de um produto específico com base no ID informado.";
+    return op;
+});
 
-// ✅ Criar novo produto
-app.MapPost("/gateway/estoque/produtos", async (HttpContext ctx, IHttpClientFactory factory) =>
+
+app.MapPost("/gateway/estoque/produtos", async (ProdutoDTO produto, IHttpClientFactory factory, HttpContext ctx) =>
 {
     var client = factory.CreateClient("estoque");
-    var token = ctx.Request.Headers["Authorization"].ToString();
 
-    // Lê o corpo da requisição original
-    var body = await new StreamReader(ctx.Request.Body).ReadToEndAsync();
     var request = new HttpRequestMessage(HttpMethod.Post, "/produtos")
     {
-        Content = new StringContent(body, Encoding.UTF8, "application/json")
+        Content = JsonContent.Create(produto)
     };
+
+    // Passa o token recebido pelo Gateway
+    var token = ctx.Request.Headers["Authorization"].ToString();
     request.Headers.Add("Authorization", token);
 
     var response = await client.SendAsync(request);
     var content = await response.Content.ReadAsStringAsync();
 
-    return Results.Content(content, "application/json");
+    return Results.Json(content, statusCode: (int)response.StatusCode);
 })
 .RequireAuthorization()
-.WithTags("Gateway - Estoque");
+.WithTags("Gateway - Estoque")
+.WithName("CriarProduto")
+.WithOpenApi(op =>
+{
+    op.Summary = "Criar novo produto";
+    op.Description = "Adiciona um novo produto ao estoque com base nas informações fornecidas.";
+    return op;
+});
 
-// ✅ Atualizar produto
-app.MapPut("/gateway/estoque/produtos/{id:int}", async (int id, HttpContext ctx, IHttpClientFactory factory) =>
+
+app.MapPut("/gateway/estoque/produtos/{id:int}", async (int id, ProdutoDTO produto, IHttpClientFactory factory, HttpContext ctx) =>
 {
     var client = factory.CreateClient("estoque");
-    var token = ctx.Request.Headers["Authorization"].ToString();
 
-    var body = await new StreamReader(ctx.Request.Body).ReadToEndAsync();
     var request = new HttpRequestMessage(HttpMethod.Put, $"/produtos/{id}")
     {
-        Content = new StringContent(body, Encoding.UTF8, "application/json")
+        Content = JsonContent.Create(produto)
     };
+
+    var token = ctx.Request.Headers["Authorization"].ToString();
     request.Headers.Add("Authorization", token);
 
     var response = await client.SendAsync(request);
     var content = await response.Content.ReadAsStringAsync();
 
-    return Results.Content(content, "application/json");
+    return Results.Json(content, statusCode: (int)response.StatusCode);
 })
 .RequireAuthorization()
-.WithTags("Gateway - Estoque");
+.WithTags("Gateway - Estoque")
+.WithName("AtualizarProduto")
+.WithOpenApi(op =>
+{
+    op.Summary = "Atualizar produto";
+    op.Description = "Atualiza os dados de um produto existente no estoque com base no ID.";
+    return op;
+});
 
-// ✅ Excluir produto
+
 app.MapDelete("/gateway/estoque/produtos/{id:int}", async (int id, IHttpClientFactory factory, HttpContext ctx) =>
 {
     var client = factory.CreateClient("estoque");
@@ -260,17 +309,18 @@ app.MapDelete("/gateway/estoque/produtos/{id:int}", async (int id, IHttpClientFa
     return Results.Content(content, "application/json");
 })
 .RequireAuthorization()
-.WithTags("Gateway - Estoque");
-
+.WithTags("Gateway - Estoque")
+.WithName("ExcluirProduto")
+.WithOpenApi(op =>
+{
+    op.Summary = "Excluir produto";
+    op.Description = "Remove um produto do estoque com base no ID fornecido.";
+    return op;
+});
 #endregion
 
 
 
 app.MapGet("/", () => Results.Redirect("/swagger")).AllowAnonymous();
-
 app.Run();
 
-#region DTOs locais
-record LoginRequest(string Username, string Password);
-record LoginResponse(string Token, DateTime Expires);
-#endregion

@@ -31,13 +31,13 @@ public class EstoqueConsumer
         {
             var body = ea.Body.ToArray();
             var mensagem = Encoding.UTF8.GetString(body);
-            Console.WriteLine($"[✔] Mensagem recebida: {mensagem}");
+            Console.WriteLine($" Mensagem recebida: {mensagem}");
 
             var partes = mensagem.Split(',');
             if (!int.TryParse(partes[0].Split(':')[1], out int produtoId)) return;
             if (!int.TryParse(partes[1].Split(':')[1], out int quantidadeVendida)) return;
 
-            // ✅ Cria escopo válido aqui
+            // Cria escopo válido aqui
             using var scope = _scopeFactory.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<EstoqueContext>();
 
@@ -46,7 +46,7 @@ public class EstoqueConsumer
             {
                 produto.Quantidade -= quantidadeVendida;
                 await db.SaveChangesAsync();
-                Console.WriteLine($"[✔] Estoque atualizado: Produto {produtoId}, Nova quantidade: {produto.Quantidade}");
+                Console.WriteLine($" Estoque atualizado: Produto {produtoId}, Nova quantidade: {produto.Quantidade}");
             }
         };
 
