@@ -169,3 +169,4 @@ C:\Users\honor\IdeaProjects\DesafioAvanade\MicroservicosEcommerce\MicroservicoVe
 C:\Users\honor\IdeaProjects\DesafioAvanade\MicroservicosEcommerce\MicroservicoVendas\obj\Debug\net9.0\MicroservicoVendas.pdb
 C:\Users\honor\IdeaProjects\DesafioAvanade\MicroservicosEcommerce\MicroservicoVendas\obj\Debug\net9.0\MicroservicoVendas.genruntimeconfig.cache
 C:\Users\honor\IdeaProjects\DesafioAvanade\MicroservicosEcommerce\MicroservicoVendas\obj\Debug\net9.0\ref\MicroservicoVendas.dll
+C:\Users\honor\IdeaProjects\DesafioAvanade\MicroservicosEcommerce\MicroservicoVendas\bin\Debug\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
